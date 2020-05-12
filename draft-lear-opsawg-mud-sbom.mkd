@@ -19,8 +19,18 @@ author:
     code: CH-8304
     city: Wallisellen
     country: Switzerland
-    phone: +41 44 878 9200
+    phone: "+41 44 878 9200"
     email: lear@cisco.com
+ -
+    ins: S. Rose
+    name: Scott Rose
+    org: NIST
+    street: 100 Bureau Dr
+    code: "20899"
+    city: Gaithersburg MD
+    country: USA
+    phone: "+1 301-975-8439"
+    email: scott.rose@nist.gov
 
 normative:
    RFC6991:
@@ -58,7 +68,7 @@ Introduction
 
 Manufacturer Usage Descriptions (MUD) {{RFC8520}} provides a means for
 devices to identify what they are and what sort of network access they
-need.This memo specifies a YANG model for reporting and a means for
+need. This memo specifies a YANG model {{RFC6991}} for reporting and a means for
 transmitting the report, and appropriate extensions to the MUD file to
 indicate how to report and how often.
 
@@ -70,7 +80,7 @@ are different SBOM formats such as Software Package Data Exchange
 This memo extends the MUD YANG schema to provide location information
 of an SBOM.
 
-These SBOMs may be found in at least three ways:
+These SBOMs are typically found in one of three ways:
 
 * on devices themselves
 * on a web site (e.g., via URI)
@@ -89,7 +99,7 @@ NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED",
 described in BCP 14 {{RFC2119}} {{RFC8174}} when, and only when, they
 appear in all capitals, as shown here.
 
-How This Informtation Is Used
+How This Information Is Used
 -----------------------------
 SBOMs are used for numerous purposes, including vulnerability
 assessment, license management, and inventory management.  This memo
@@ -125,6 +135,8 @@ The following is discussion to be removed at time of RFC publication.
  * Are there other retrieval mechanisms that need to be specified?
  * Do we need to be more specific in how to authenticate and retrieve
    SBOMs?
+ * What are the implications if the MUD URL is an extension in a certificate
+   (e.g. an IDevID cert)?
 
 
 The mud-sbom extension model extension
@@ -227,7 +239,7 @@ module ietf-mud-sbom {
           leaf sbom-url {
             type inet:uri;
             description
-              "An statically located URI.";
+              "A statically located URI.";
           }
         }
         case local-uri {
@@ -320,6 +332,62 @@ Without ACLS
       {
          "version-info" : "FrobOS Release 1.1",
          "sbom-url" : "https://frobinator.example.com/sboms/f20001.1",
+      }
+    ]
+  }
+}
+~~~~~~~~
+
+Located on the Device
+---------------------
+
+~~~~~~~~
+{
+  "ietf-mud:mud": {
+    "mud-version": 1,
+    "mud-url": "https://iot-device.example.com/dnsname",
+    "last-update": "2019-01-15T10:22:47+00:00",
+    "cache-validity": 48,
+    "is-supported": true,
+    "systeminfo": "device that wants to talk to a cloud service",
+    "mfg-name": "Example, Inc.",
+    "documentation": "https://frobinator.example.com/doc/frob2000",
+    "model-name": "Frobinator 2000",
+    "extensions" : [ 
+       "sbom"
+      ],
+    "sboms" : [
+      {
+         "version-info" : "FrobOS Release 1.1",
+         "sbom-local" : "coaps:///.well-known/sbom",
+      }
+    ]
+  }
+}
+~~~~~~~~
+
+SBOM Obtained from Contact Information
+--------------------------------------
+
+~~~~~~~~
+{
+  "ietf-mud:mud": {
+    "mud-version": 1,
+    "mud-url": "https://iot-device.example.com/dnsname",
+    "last-update": "2019-01-15T10:22:47+00:00",
+    "cache-validity": 48,
+    "is-supported": true,
+    "systeminfo": "device that wants to talk to a cloud service",
+    "mfg-name": "Example, Inc.",
+    "documentation": "https://frobinator.example.com/doc/frob2000",
+    "model-name": "Frobinator 2000",
+    "extensions" : [ 
+       "sbom"
+      ],
+    "sboms" : [
+      {
+         "version-info" : "FrobOS Release 1.1",
+         "contact-uri" : "mailto:sbom-requst@example.com",
       }
     ]
   }
@@ -472,7 +540,7 @@ client is not authorized, the server MUST produce an appropriate
 error, with instructions on how to register a particular client.  One
 example may be to issue a certificate to the client for this purpose
 after a registration process has taken place.  Another example would
-invole the use of OAUTH in combination with a federations of SBOM
+envole the use of OAUTH in combination with a federations of SBOM
 servers.
 
 To further mitigate attacks against a device, manufacturers SHOULD

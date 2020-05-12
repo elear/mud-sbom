@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<reference  anchor='RFC6991' target='https://www.rfc-editor.org/info/rfc6991'>
+<front>
+<title>Common YANG Data Types</title>
+<author initials='J.' surname='Schoenwaelder' fullname='J. Schoenwaelder' role='editor'><organization /></author>
+<date year='2013' month='July' />
+<abstract><t>This document introduces a collection of common data types to be used with the YANG data modeling language.  This document obsoletes RFC 6021.</t></abstract>
+</front>
+<seriesInfo name='RFC' value='6991'/>
+<seriesInfo name='DOI' value='10.17487/RFC6991'/>
+</reference>

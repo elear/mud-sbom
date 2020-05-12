@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<reference  anchor='RFC8615' target='https://www.rfc-editor.org/info/rfc8615'>
+<front>
+<title>Well-Known Uniform Resource Identifiers (URIs)</title>
+<author initials='M.' surname='Nottingham' fullname='M. Nottingham'><organization /></author>
+<date year='2019' month='May' />
+<abstract><t>This memo defines a path prefix for &quot;well-known locations&quot;, &quot;/.well-known/&quot;, in selected Uniform Resource Identifier (URI) schemes.</t><t>In doing so, it obsoletes RFC 5785 and updates the URI schemes defined in RFC 7230 to reserve that space.  It also updates RFC 7595 to track URI schemes that support well-known URIs in their registry.</t></abstract>
+</front>
+<seriesInfo name='RFC' value='8615'/>
+<seriesInfo name='DOI' value='10.17487/RFC8615'/>
+</reference>
