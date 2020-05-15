@@ -540,7 +540,7 @@ client is not authorized, the server MUST produce an appropriate
 error, with instructions on how to register a particular client.  One
 example may be to issue a certificate to the client for this purpose
 after a registration process has taken place.  Another example would
-envole the use of OAUTH in combination with a federations of SBOM
+involve the use of OAUTH in combination with a federations of SBOM
 servers.
 
 To further mitigate attacks against a device, manufacturers SHOULD
