@@ -1,7 +1,7 @@
 ---
 title: SBOM Extension for MUD
 abbrev: SBOM for MUD
-docname: draft-lear-opsawg-mud-reporter-00
+docname: draft-lear-opsawg-mud-reporter-latest
 category: std
 
 ipr: trust200902
