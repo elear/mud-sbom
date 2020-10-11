@@ -1,7 +1,7 @@
 
-DOCS=	draft-lear-opsawg-mud-sbom.txt \
-	draft-lear-opsawg-mud-sbom.xml \
-	draft-lear-opsawg-mud-sbom.html
+DOCS=	draft-lear-opsawg-sbom-access.txt \
+	draft-lear-opsawg-sbom-access.xml \
+	draft-lear-opsawg-sbom-access.html
 
 all: $(DOCS)
 
