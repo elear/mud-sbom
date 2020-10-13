@@ -71,7 +71,7 @@ Introduction
 ============
 
 Software bills of material (SBOMs) are descriptions of what software,
-including versionioning and dependencies, a device contains.  There
+including versioning and dependencies, a device contains.  There
 are different SBOM formats such as Software Package Data Exchange
 {{SPDX}}, Software Identity Tags {{SWID}}, or CycloneDX{{CycloneDX12}}.
 
@@ -80,12 +80,12 @@ This memo specifies means by which SBOMs can be advertised and retrieved.
 The mechanisms specified in this document are meant to satisfy several
 use cases:
 
-* An application-layer management system is to retrieve an SBOM in
+* An application-layer management system retrieving an SBOM in
   order to evaluate the posture of an application server of some
   form.  These application servers may themselves be containers or
   hypervisors.  Discovery of the topology of a server is beyond the
   scope of this memo.
-* A network-layer management system is to retrieve an SBOM from an IoT
+* A network-layer management system retrieving an SBOM from an IoT
   device as part of its ongoing lifecycle. Such devices may or may not
   have interfaces available to query SBOM information.
 
@@ -569,6 +569,12 @@ example may be to issue a certificate to the client for this purpose
 after a registration process has taken place.  Another example would
 involve the use of OAUTH in combination with a federations of SBOM
 servers.
+
+Another risk is a skew in the SBOM listing and the actual software 
+inventory of a device/container. For example, a manufactuer may update
+the SBOM on its server, but an individual device has not be upgraded yet. 
+This may result in an incorrect policy being applied to a device. A unique mapping of a device's firmware version and its SBOM can 
+minimize this risk.
 
 To further mitigate attacks against a device, manufacturers SHOULD
 recommend access controls through the normal MUD mechanism.
