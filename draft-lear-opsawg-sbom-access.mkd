@@ -1,7 +1,7 @@
 ---
-title: SBOM Extension for MUD
-abbrev: SBOM for MUD
-docname: draft-lear-opsawg-mud-sbom-00
+title: Discovering And Accessing Software Bills of Materials
+abbrev: Accessing SBOMs
+docname: draft-lear-opsawg-sbom-access-00
 category: std
 
 ipr: trust200902
