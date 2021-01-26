@@ -1,7 +1,7 @@
 ---
 title: Discovering And Accessing Software Bills of Materials
 abbrev: Accessing SBOMs
-docname: draft-lear-opsawg-sbom-access-00
+docname: draft-ietf-opsawg-sbom-access-00
 category: std
 
 ipr: trust200902
@@ -80,14 +80,14 @@ This memo specifies means by which SBOMs can be advertised and retrieved.
 The mechanisms specified in this document are meant to satisfy several
 use cases:
 
-* A management system retrieving an SBOM in
-  order to evaluate the posture of an server of some
-  form.  These servers may themselves be operating systems, containers or
+* An application-layer management system retrieving an SBOM in
+  order to evaluate the posture of an application server of some
+  form.  These application servers may themselves be containers or
   hypervisors.  Discovery of the topology of a server is beyond the
   scope of this memo.
-* A management system retrieving an SBOM from an IoT
+* A network-layer management system retrieving an SBOM from an IoT
   device as part of its ongoing lifecycle. Such devices may or may not
-  have interfaces available to be queried for SBOM information.
+  have interfaces available to query SBOM information.
 
 To satisfy these two key use cases, SBOMs may be found in one of three
 ways:
@@ -334,8 +334,8 @@ Examples
 In this example MUD file that uses a cloud service, the Frobinator
 presents a location of the SBOM in a URL.  Note, the ACLs in a MUD
 file are NOT required, although they are a very good idea for IP-based
-devices.  The first three MUD files demonstrates how to get the SBOM
-without ACLs, and the fourth has ACLs.
+devices.  The first MUD file demonstrates how to get the SBOM without
+ACLs, and the second has ACLs.
 
 Without ACLS
 ------------
