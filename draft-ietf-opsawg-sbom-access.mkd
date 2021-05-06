@@ -1,9 +1,9 @@
 ---
 title: Discovering And Accessing Software Bills of Materials
 abbrev: Accessing SBOMs
-docname: draft-ietf-opsawg-sbom-access-00
+docname: draft-ietf-opsawg-sbom-access-01
 category: std
-
+consensus: true
 ipr: trust200902
 keyword: Internet-Draft
 
@@ -33,8 +33,6 @@ author:
     email: scott.rose@nist.gov
 
 normative:
-   RFC6991:
-   RFC8520:
    RFC2119:
    RFC8174:
 
@@ -44,21 +42,20 @@ informative:
      author:
        org: The Linux Foundation
      date: 2016
-   SWID:
-     title: >
-       Information technology — IT asset management — Part 2:
-       Software identification tag
-     author:
-       org: ISO/IEC
-     seriesinfo:
-       ISO: '19770-2:2015'
-     date: 2015
    CycloneDX12:
      title: CycloneDX XML Reference v1.2
      author:
        org: cylonedx.org
      date: May, 2020
-   
+   OpenC2:
+     title: Specification for Transfer of OpenC2 Messages via HTTPS Version 1.0
+     author:
+        ins: D. Lemire
+        name: David Lemire
+        role: editor
+        org: OASIS
+     target: https://docs.oasis-open.org/openc2/open-impl-https/v1.0/open-impl-https-v1.0.html
+     date: 11 July 2019
 --- abstract
 
 Software bills of materials (SBOMs) are formal descriptions of what
@@ -73,7 +70,7 @@ Introduction
 Software bills of material (SBOMs) are descriptions of what software,
 including versioning and dependencies, a device contains.  There
 are different SBOM formats such as Software Package Data Exchange
-{{SPDX}}, Software Identity Tags {{SWID}}, or CycloneDX{{CycloneDX12}}.
+{{SPDX}} or CycloneDX{{CycloneDX12}}.
 
 This memo specifies means by which SBOMs can be advertised and retrieved.
 
@@ -97,8 +94,8 @@ ways:
 * through some form of out-of-band contact with the supplier.
 
 In the first case, devices will have interfaces that permit direct
-SBOM retrieval.  Examples of these interfaces might be an
-HTTP or COAP endpoint for retrieval.  There may also be private
+SBOM retrieval.  Examples of these interfaces might be an HTTP, COAP
+or {{OpenC2}} endpoint for retrieval.  There may also be private
 interfaces as well.
 
 In the second case, when a device does not have an appropriate
@@ -179,16 +176,20 @@ This is done as follows:
 
 ~~~~~~~~~
 module: ietf-mud-sbom
+
   augment /mud:mud:
-    +--rw sboms* [version-info]
-       +--rw version-info         string
+    +--rw sbom
        +--rw (sbom-type)?
-          +--:(url)
-          |  +--rw sbom-url?      inet:uri
-          +--:(local-uri)
-          |  +--rw sbom-local*    enumeration
+          +--:(cloud)
+          |  +--rw sboms* [version-info]
+          |     +--rw version-info    string
+          |     +--rw sbom-url?       inet:uri
+          +--:(local-well-known)
+          |  +--rw local-well-known?   empty
           +--:(contact-info)
-             +--rw contact-uri?   inet:uri
+          |  +--rw contact-uri         inet:uri
+          +--:(openc2)
+             +--rw openc2-uri          inet:uri
 ~~~~~~~~~
 
 The mud-sbom augmentation to the MUD YANG model
@@ -196,7 +197,7 @@ The mud-sbom augmentation to the MUD YANG model
 
 ~~~~~~~~~
 
-<CODE BEGINS>file "ietf-mud-sbom@2020-03-06.yang"
+<CODE BEGINS>file "ietf-mud-sbom@2021-04-29.yang"
 module ietf-mud-sbom {
   yang-version 1.1;
   namespace "urn:ietf:params:xml:ns:yang:ietf-mud-sbom";
@@ -215,12 +216,13 @@ module ietf-mud-sbom {
     "WG
      Web: http://tools.ietf.org/wg/opsawg/
      WG List: opsawg@ietf.org
-     Author: Eliot Lear lear@cisco.com ";
+     Author: Eliot Lear lear@cisco.com
+     Author: Scott Rose scott.rose@nist.gov";
   description
     "This YANG module augments the ietf-mud model to provide for
      reporting of SBOMs.
 
-     Copyright (c) 2019 IETF Trust and the persons identified as
+     Copyright (c) 2020 IETF Trust and the persons identified as
      authors of the code.  All rights reserved.
 
      Redistribution and use in source and binary forms, with or
@@ -231,8 +233,8 @@ module ietf-mud-sbom {
      (https://trustee.ietf.org/license-info).
 
      This version of this YANG module is part of RFC XXXX
-     (https://www.rfc-editor.org/info/rfcXXXX); see the RFC itself for
-     full legal notices.
+     (https://www.rfc-editor.org/info/rfcXXXX); see the RFC itself
+     for full legal notices.
 
      The key words 'MUST', 'MUST NOT', 'REQUIRED', 'SHALL', 'SHALL
      NOT', 'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'NOT RECOMMENDED',
@@ -240,80 +242,72 @@ module ietf-mud-sbom {
      described in BCP 14 (RFC 2119) (RFC 8174) when, and only when,
      they appear in all capitals, as shown here.  ";
 
-  revision 2020-03-06 {
+  revision 2021-04-29 {
     description
       "Initial proposed standard.";
     reference
-      "RFC XXXX: Extension for MUD Reporting";
+      "RFC XXXX: Extension for MUD SBOM";
   }
 
   grouping mud-sbom-extension {
     description
       "SBOM extension grouping";
-    list sboms {
-      key "version-info";
-      leaf version-info {
-        type string;
-        description
-          "A version string that is applicable for this SBOM list entry.
-           The format of this string is left to the device manufacturer.
-           How the network administrator determines the version of
-           software running on the device is beyond the scope of this
-           memo.";
-      }
+    container sbom {
+      description
+        "container of methods to get an SBOM.";
       choice sbom-type {
-        case url {
-          leaf sbom-url {
-            type inet:uri;
+        description
+          "SBOM type";
+        case cloud {
+          list sboms {
+            key "version-info";
             description
-              "A statically located URI.";
+              "A list of SBOMs tied to different s/w
+               or h/w versions.";
+            leaf version-info {
+              type string;
+              description
+                "The version to which this SBOM refers.";
+            }
+            leaf sbom-url {
+              type inet:uri;
+              description
+                "A statically located URI.";
+            }
           }
         }
-        case local-uri {
-          leaf-list sbom-local {
-            type enumeration {
-              enum coap {
-                description
-                  "Use COAP schema to retrieve SBOM";
-              }
-              enum coaps {
-                description
-                  "Use COAPS schema to retrieve SBOM";
-              }
-              enum http {
-                description
-                  "Use HTTP schema to retrieve SBOM";
-              }
-              enum https {
-                description
-                  "Use HTTPS schema to retrieve SBOM";
-              }
-            }
+        case local-well-known {
+          leaf local-well-known {
+            type empty;
             description
-              "The choice of sbom-local means that the SBOM resides at
-              a location indicated by an indicted scheme for the
-              device in question, at well known location
-              '/.well-known/sbom'.  For example, if the MUD file
-              indicates that coaps is to be used and the host is
-              located at address 10.1.2.3, the SBOM could be retrieved
-              at 'coaps://10.1.2.3/.well-known/sbom'.  N.B., coap and
-              http schemes are NOT RECOMMENDED.";
+              "SBOM information is to be retrieved via
+                https from the host on port 443, at
+                https://{hostname}/.well-known/sbom, where
+                hostname is replaced with the host to which
+                this MUD extension refers.";
           }
         }
         case contact-info {
           leaf contact-uri {
             type inet:uri;
+            mandatory true;
             description
               "This MUST be either a tel, http, https, or
                mailto uri schema that customers can use to
                contact someone for SBOM information.";
           }
         }
-        description
-          "choices for SBOM retrieval.";
+        case openc2 {
+          leaf openc2-uri {
+            type inet:uri;
+            mandatory true;
+            description
+              "A link to the OpenC2 https RESTful
+                 \t mapping.  The OpenC2 protocol is then
+                      used to retrieve the SBOM";
+          }
+        }
       }
-      description
-        "list of methods to get an SBOM.";
     }
   }
 
@@ -323,7 +317,6 @@ module ietf-mud-sbom {
     uses mud-sbom-extension;
   }
 }
-
 <CODE ENDS>
 ~~~~~~~~~
 
@@ -350,17 +343,18 @@ Without ACLS
     "is-supported": true,
     "systeminfo": "device that wants to talk to a cloud service",
     "mfg-name": "Example, Inc.",
-    "documentation": "https://frobinator.example.com/doc/frob2000",
+    "documentation": "https://frob.example.com/doc/frob2000",
     "model-name": "Frobinator 2000",
     "extensions" : [ 
        "sbom"
       ],
-    "sboms" : [
+    "sboms" : { "sbom" : [
       {
          "version-info" : "FrobOS Release 1.1",
-         "sbom-url" : "https://frobinator.example.com/sboms/f20001.1",
+         "sbom-url" : "https://frob.example.com/sboms/f20001.1",
       }
     ]
+    }
   }
 }
 ~~~~~~~~
@@ -378,17 +372,14 @@ Located on the Device
     "is-supported": true,
     "systeminfo": "device that wants to talk to a cloud service",
     "mfg-name": "Example, Inc.",
-    "documentation": "https://frobinator.example.com/doc/frob2000",
+    "documentation": "https://frob.example.com/doc/frob2000",
     "model-name": "Frobinator 2000",
     "extensions" : [ 
        "sbom"
       ],
-    "sboms" : [
-      {
-         "version-info" : "FrobOS Release 1.1",
+    "sboms" : "sbom" : {
          "sbom-local" : "coaps:///.well-known/sbom",
       }
-    ]
   }
 }
 ~~~~~~~~
@@ -406,17 +397,15 @@ SBOM Obtained from Contact Information
     "is-supported": true,
     "systeminfo": "device that wants to talk to a cloud service",
     "mfg-name": "Example, Inc.",
-    "documentation": "https://frobinator.example.com/doc/frob2000",
+    "documentation": "https://frob.example.com/doc/frob2000",
     "model-name": "Frobinator 2000",
     "extensions" : [ 
        "sbom"
       ],
-    "sboms" : [
-      {
-         "version-info" : "FrobOS Release 1.1",
+    "sboms" : { "sbom" : {
          "contact-uri" : "mailto:sbom-requst@example.com",
       }
-    ]
+    }
   }
 }
 ~~~~~~~~
@@ -434,17 +423,18 @@ With ACLS
     "is-supported": true,
     "systeminfo": "device that wants to talk to a cloud service",
     "mfg-name": "Example, Inc.",
-    "documentation": "https://frobinator.example.com/doc/frob2000",
+    "documentation": "https://frob.example.com/doc/frob2000",
     "model-name": "Frobinator 2000",
     "extensions" : [ 
        "sbom"
       ],
-    "sboms" : [
+    "sboms" : "sbom" : [
       {
          "version-info" : "FrobOS Release 1.1",
-         "sbom-url" : "https://frobinator.example.com/sboms/f20001.1",
-      }
+         "sbom-url" : "https://frob.example.com/sboms/f20001.1",
+      },
     ],
+   },
     "from-device-policy": {
       "access-lists": {
         "access-list": [
@@ -481,7 +471,7 @@ With ACLS
               "name": "cl0-todev",
               "matches": {
                 "ipv4": {
-                  "ietf-acldns:src-dnsname": "cloud-service.example.com"
+                  "ietf-acldns:src-dnsname": "cloud.example.com"
                 }
               },
               "actions": {
@@ -500,7 +490,7 @@ With ACLS
               "name": "cl0-frdev",
               "matches": {
                 "ipv4": {
-                  "ietf-acldns:dst-dnsname": "cloud-service.example.com"
+                  "ietf-acldns:dst-dnsname": "cloud.example.com"
                 }
               },
               "actions": {
@@ -519,7 +509,7 @@ With ACLS
               "name": "cl0-todev",
               "matches": {
                 "ipv6": {
-                  "ietf-acldns:src-dnsname": "cloud-service.example.com"
+                  "ietf-acldns:src-dnsname": "cloud.example.com"
                 }
               },
               "actions": {
@@ -538,7 +528,7 @@ With ACLS
               "name": "cl0-frdev",
               "matches": {
                 "ipv6": {
-                  "ietf-acldns:dst-dnsname": "cloud-service.example.com"
+                  "ietf-acldns:dst-dnsname": "cloud.example.com"
                 }
               },
               "actions": {
