@@ -578,7 +578,7 @@ SBOMs provide an inventory of software.  If firmware is available to
 an attacker, the attacker may well already be able to derive this very
 same software inventory.  Manufacturers MAY restrict access to SBOM
 information using appropriate authorization semantics within HTTP.  In
-particular, if a system attempts to retrieve an SBOM via HTTP, if the
+particular, if a system attempts to retrieve an SBOM via HTTP and the
 client is not authorized, the server MUST produce an appropriate
 error, with instructions on how to register a particular client.  One
 example may be to issue a certificate to the client for this purpose
@@ -587,7 +587,7 @@ involve the use of OAUTH in combination with a federations of SBOM
 servers.
 
 Another risk is a skew in the SBOM listing and the actual software 
-inventory of a device/container. For example, a manufactuer may update
+inventory of a device/container. For example, a manufacturer may update
 the SBOM on its server, but an individual device has not be upgraded yet. 
 This may result in an incorrect policy being applied to a device. A unique mapping of a device's firmware version and its SBOM can 
 minimize this risk.
