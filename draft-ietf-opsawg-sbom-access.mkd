@@ -104,19 +104,19 @@ are different SBOM formats such as Software Package Data Exchange
 {{SPDX}} or CycloneDX{{CycloneDX12}}.
 
 System vulnerabilities may similarly be described using several data
-formats, including the afformentioned CycloneDX, Common Vulnerability
+formats, including the aforementioned CycloneDX, Common Vulnerability
 Reporting Framework {{CVRF}}, the Common Security Advisory Format {{CSAF}}.
 This information is typically used to report to customers the state of
 a system.
 
 These two classes of information can be used in concert.  For
 instance, a network management tool may discover that a system makes
-use of a particular use of software that is known to be vulnerable,
+use of a particular software component that has a known vulnerability,
 and a vulnerability report may be used to indicate what if any
 versions of software correct that vulnerability, or whether the system
 exercises the vulnerable code at all.
 
-Both of these classes of information elements are optional under the
+Both classes of information elements are optional under the
 model specified in this memo.  One can provide only an SBOM, only
 vulnerability information, or both an SBOM and vulnerability
 information.
