@@ -1,9 +1,8 @@
 ---
-title: Discovering And Accessing Software Bills of Materials
-abbrev: Accessing SBOMs
-docname: draft-ietf-opsawg-sbom-access-01
+title: Discovering and Retrieving Software Transparency and Vulnerability Information
+abbrev: Discovering SBOMs and Vuln. Info
+docname: draft-ietf-opsawg-sbom-access-02
 category: std
-consensus: true
 ipr: trust200902
 keyword: Internet-Draft
 
@@ -56,66 +55,118 @@ informative:
         org: OASIS
      target: https://docs.oasis-open.org/openc2/open-impl-https/v1.0/open-impl-https-v1.0.html
      date: 11 July 2019
+   CSAF:
+     title: Common Security Advisory Format
+     author:
+        org: OASIS
+     target: https://github.com/oasis-tcs/csaf
+     date: July, 2021
+   CVRF:
+     title: Common Vulnerability Reporting Framework (CVRF) Version 1.2
+     author:
+        ins: O. Santos
+	name: Omar Santos
+	role: editor
+	email: os@cisco.com
+	org: OASIS
+     target: http://docs.oasis-open.org/csaf/csaf-cvrf/v1.2/csaf-cvrf-v1.2.pdf
+     date: September, 2017
+     
+	
+       
+     
 --- abstract
 
-Software bills of materials (SBOMs) are formal descriptions of what
-pieces of software are included in a product.  This memo specifies a
-different means for SBOMs to be retrieved.
+To improve cybersecurity posture, automation is necessary to locate
+what software is running on a device, whether that software has known
+vulnerabilities, and what, if any recommendations suppliers may have.
+This memo specifies a model to provide access this information.  It
+may optionally be discovered through manufacturer usage descriptions.
 
 --- middle
 
 Introduction
 ============
 
+A number of activities have been working to improve visibility to what
+software is running on a system, and what vulnerabilities that
+software may have.
+
+Put simply, we seek to answer two classes of questions **at scale**:
+
+ - Is this system vulnerable to a particular vulnerability?
+ - Which devices in a particular environment contain vulnerabilities
+   that require some action?
+
 Software bills of material (SBOMs) are descriptions of what software,
 including versioning and dependencies, a device contains.  There
 are different SBOM formats such as Software Package Data Exchange
 {{SPDX}} or CycloneDX{{CycloneDX12}}.
 
-This memo specifies means by which SBOMs can be advertised and retrieved.
+System vulnerabilities may similarly be described using several data
+formats, including the afformentioned CycloneDX, Common Vulnerability
+Reporting Framework {{CVRF}}, the Common Security Advisory Format {{CSAF}}.
+This information is typically used to report to customers the state of
+a system.
+
+These two classes of information can be used in concert.  For
+instance, a network management tool may discover that a system makes
+use of a particular use of software that is known to be vulnerable,
+and a vulnerability report may be used to indicate what if any
+versions of software correct that vulnerability, or whether the system
+exercises the vulnerable code at all.
+
+Both of these classes of information elements are optional under the
+model specified in this memo.  One can provide only an SBOM, only
+vulnerability information, or both an SBOM and vulnerability
+information.
+
+This memo specifies means by which both SBOMs and vulnerability
+information can be advertised and retrieved through the use of a YANG
+augmentation of the Manufacturer User Description (MUD) model
+{{!RFC8520}}.  Note that the schema creates a grouping that can also
+be used independently of MUD.
 
 The mechanisms specified in this document are meant to satisfy several
 use cases:
 
-* A network-layer management system retrieving an SBOM from an IoT
+* A network-layer management system retrieving information from an IoT
   device as part of its ongoing lifecycle. Such devices may or may not
-  have interfaces available to query SBOM information.
+  have query interfaces available.
 
-* An application-layer management system retrieving an SBOM in
-  order to evaluate the posture of an application server of some
-  form.  These application servers may themselves be containers or
-  hypervisors.  Discovery of the topology of a server is beyond the
-  scope of this memo.
+* An application-layer management system retrieving vulnerability or
+  SBOM information in order to evaluate the posture of an application
+  server of some form.  These application servers may themselves be
+  containers or hypervisors.  Discovery of the topology of a server is
+  beyond the scope of this memo.
 
-To satisfy these two key use cases, SBOMs may be found in one of three
-ways:
+To satisfy these two key use cases, objects may be found in one of
+three ways:
 
 * on devices themselves
 * on a web site (e.g., via URI)
 * through some form of out-of-band contact with the supplier.
 
 In the first case, devices will have interfaces that permit direct
-SBOM retrieval.  Examples of these interfaces might be an HTTP, COAP
+retrieval.  Examples of these interfaces might be an HTTP, COAP
 or {{OpenC2}} endpoint for retrieval.  There may also be private
 interfaces as well.
 
 In the second case, when a device does not have an appropriate
-interface to retrieve an SBOM, but one is directly available from the
+retrieval interface, but one is directly available from the
 manufacturer, a URI to that information must be discovered.
 
-In the third case, a supplier may wish to make an SBOM available under
-certain circumstances, and may need to individually evaluate requests.
-The result of that evaluation might be the SBOM itself or a restricted
+In the third case, a supplier may wish to make an SBOM or
+vulnerability information available under certain circumstances, and
+may need to individually evaluate requests.  The result of that
+evaluation might be the SBOM or vulnerability itself or a restricted
 URL or no access.
 
 To enable application-layer discovery, this memo defines a well-known
 URI {{!RFC8615}}.  Management or orchestration tools can query this
-well-known URI to retrieve a system's SBOM.  Further queries may be
-necessary based on the content and structure of a particular SBOM.
-
-To enable network-layer discovery, particularly for IOT-based devices,
-an extension to Manufacturer Usage Descriptions (MUD) may be
-used{{!RFC8520}}.
+well-known URI to retrieve a system's SBOM or vulnerability
+information.  Further queries may be necessary based on the content
+and structure of the response.
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
 NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED",
@@ -140,34 +191,30 @@ A separate use case may be addressed in future versions of this document:
 The reason why this use case isn’t addressed here is that it may be
 better addressed inline within HTML.  Further discussion is required.
 
-How This Information Is Used
------------------------------
-SBOMs are used for numerous purposes, including vulnerability
-assessment, license management, and inventory management.  This memo
-provides means for either automated or semi-automated collection of
-that information.  For devices that can output a MUD URL or establish
-a well-known URI, the mechanism may be highly automated.  For devices
-that have a MUD URL in either their documentation or within a QR code
-on a box, the mechanism is semi-automated (someone has to scan the QR
-code or enter the URL).
+How This Information Is Retreived
+---------------------------------
 
-Note that SBOMs may change more frequently than access control
-requirements.  A change to software does not necessarily mean a change
-to control channels that are used.  Therefore, it is important to
-retrieve the MUD file as suggested by the manufacturer in the
-cache-validity period.  In many cases, only the SBOM list will have
-been updated.
+For devices that can emit a URL or can establish a well-known URI, the
+mechanism may be highly automated.  For devices that have a URL in
+either their documentation or within a QR code on a box, the mechanism
+is semi-automated (someone has to scan the QR code or enter the URL).
 
-SBOM formats
+Note that vulnerability and SBOM information is likely to  change at
+different rates.  The MUD semantics provide a way for manufacturers
+to control how often tooling should check for those changes through
+the cache-validity node.
+
+Formats
 ------------
-There are multiple ways to express an SBOM.  When these are retrieved
-either directly from the device or directly from a web server, tools
-will need to observe the content-type header to determine precisely
-which format is being transmitted.  Because IoT devices in particular
-have limited capabilities, use of a specific Accept: header in HTTP 
-or the Accept Option in CoAP is NOT RECOMMENDED.  Instead, backend
-tooling MUST silently discard SBOM information sent with a media type
-that is not understood.
+There are multiple ways to express both SBOMs and vulnerability
+information.  When these are retrieved either directly from the device
+or directly from a web server, tools will need to observe the
+content-type header to determine precisely which format is being
+transmitted.  Because IoT devices in particular have limited
+capabilities, use of a specific Accept: header in HTTP or the Accept
+Option in CoAP is NOT RECOMMENDED.  Instead, backend tooling MUST
+silently discard SBOM information sent with a media type that is not
+understood.
 
 Discussion points
 -----------------
@@ -181,53 +228,64 @@ The following is discussion to be removed at time of RFC publication.
    (e.g. an IDevID cert)?
 
 
-The .well-known/sbom endpoint set
+The .well-known/transparency endpoint set
 =================================
 
-If a host offers this service, it will offer the RESTful endpoint
-beginning with "{ORIGIN}/.well-known/sbom/base".
+Two well known endpoints are defined:
+
+ - "/.well-known/transparency/sbom" retrieves an SBOM
+ - "/.well-known/transparency/vuln" retrieves vulnerability information.
+
+As discussed previously, the precise format is based on the
+Content-type provided in the response.
 
 
-The mud-sbom extension model extension
+The mud-transparency extension model extension
 ======================================
 
 We now formally define this extension.  This is done in two parts.
-First, the extension name "sbom" is listed in the "extensions" array
-of the MUD file.  N.B., this schema extension is intended to be used
-wherever it might be appropriate (e.g., not just MUD).
+First, the extension name "transparency" is listed in the "extensions"
+array of the MUD file.  N.B., this schema extension is intended to be
+used wherever it might be appropriate (e.g., not just MUD).
 
 Second, the "mud" container is augmented with a list of SBOM sources.
 
 This is done as follows:
 
 ~~~~~~~~~
-module: ietf-mud-sbom
+module: ietf-mud-transparency
 
   augment /mud:mud:
-    +--rw sbom
-       +--rw (sbom-type)?
+    +--rw transparency
+       +--rw (sbom-retrieval-method)?
+       |  +--:(cloud)
+       |  |  +--rw sboms* [version-info]
+       |  |     +--rw version-info    string
+       |  |     +--rw sbom-url?       inet:uri
+       |  +--:(local-well-known)
+       |  |  +--rw sbom-local-well-known?   enumeration
+       |  +--:(sbom-contact-info)
+       |     +--rw sbom-contact-uri         inet:uri
+       +--rw (vuln-retrieval-method)?
           +--:(cloud)
-          |  +--rw sboms* [version-info]
+          |  +--rw vulns* [version-info]
           |     +--rw version-info    string
-          |     +--rw sbom-url?       inet:uri
-          +--:(local-well-known)
-          |  +--rw local-well-known?   empty
-          +--:(contact-info)
-          |  +--rw contact-uri         inet:uri
-          +--:(openc2)
-             +--rw openc2-uri          inet:uri
+          |     +--rw vuln-url?       inet:uri
+          +--:(vuln-local-well-known)
+          |  +--rw vuln-local-well-known?   enumeration
+          +--:(vuln-contact-info)
+             +--rw contact-uri              inet:uri
 ~~~~~~~~~
 
 The mud-sbom augmentation to the MUD YANG model
 ============================
 
-~~~~~~~~~
-
-<CODE BEGINS>file "ietf-mud-sbom@2021-04-29.yang"
-module ietf-mud-sbom {
+~~~~~
+<CODE BEGINS>file "ietf-mud-sbom@2021-07-06.yang"
+module ietf-mud-transparency {
   yang-version 1.1;
-  namespace "urn:ietf:params:xml:ns:yang:ietf-mud-sbom";
-  prefix mud-sbom;
+  namespace "urn:ietf:params:xml:ns:yang:ietf-mud-transparency";
+  prefix mud-transparency;
 
   import ietf-inet-types {
     prefix inet;
@@ -259,8 +317,8 @@ module ietf-mud-sbom {
      (https://trustee.ietf.org/license-info).
 
      This version of this YANG module is part of RFC XXXX
-     (https://www.rfc-editor.org/info/rfcXXXX); see the RFC itself
-     for full legal notices.
+     (https://www.rfc-editor.org/info/rfcXXXX); see the RFC itself for
+     full legal notices.
 
      The key words 'MUST', 'MUST NOT', 'REQUIRED', 'SHALL', 'SHALL
      NOT', 'SHOULD', 'SHOULD NOT', 'RECOMMENDED', 'NOT RECOMMENDED',
@@ -268,22 +326,22 @@ module ietf-mud-sbom {
      described in BCP 14 (RFC 2119) (RFC 8174) when, and only when,
      they appear in all capitals, as shown here.  ";
 
-  revision 2021-04-29 {
+  revision 2021-07-06 {
     description
       "Initial proposed standard.";
     reference
-      "RFC XXXX: Extension for MUD SBOM";
+      "RFC XXXX: Extension for software transparency";
   }
 
-  grouping mud-sbom-extension {
+  grouping transparency-extension {
     description
-      "SBOM extension grouping";
-    container sbom {
+      "Transparency extension grouping";
+    container transparency {
       description
         "container of methods to get an SBOM.";
-      choice sbom-type {
+      choice sbom-retrieval-method {
         description
-          "SBOM type";
+          "How to find SBOM information";
         case cloud {
           list sboms {
             key "version-info";
@@ -299,56 +357,115 @@ module ietf-mud-sbom {
               type inet:uri;
               description
                 "A statically located URI.";
+             }
+           }
+         }
+        case local-well-known {
+          leaf sbom-local-well-known {
+            type enumeration {
+            enum http {
+              description "Use http (insecure) to retrieve SBOM infomration.";
+            }
+            enum https {
+              description "Use https (secure) to retrieve SBOM information.";
+            }
+            enum coap {
+              description "Use COAP (insecure) to retrieve SBOM";
+            }
+            enum coaps {
+              description "Use COAPS (secure) to retrieve SBOM";
+            }
+            enum openc2 {
+              description "Use OpenC2 endpoint.  
+                           This is https://{host}/.well-known/openc2";
             }
           }
-        }
-        case local-well-known {
-          leaf local-well-known {
-            type empty;
-            description
-              "SBOM information is to be retrieved via
-                https from the host on port 443, at
-                https://{hostname}/.well-known/sbom, where
-                hostname is replaced with the host to which
-                this MUD extension refers.";
-          }
-        }
-        case contact-info {
-          leaf contact-uri {
+	  description "Which communication protocol to choose.";
+         }
+	}
+        case sbom-contact-info {
+          leaf sbom-contact-uri {
             type inet:uri;
             mandatory true;
             description
               "This MUST be either a tel, http, https, or
                mailto uri schema that customers can use to
                contact someone for SBOM information.";
+            } 
           }
-        }
-        case openc2 {
-          leaf openc2-uri {
+      }
+      choice vuln-retrieval-method {
+        description
+          "How to find vulnerability information";
+        case cloud {
+          list vulns {
+            key "version-info";
+            description
+              "A list of URLs tied to different s/w
+               or h/w versions.";
+            leaf version-info {
+              type string;
+              description
+                "The version to which this vulnerability info refers.";
+            }
+            leaf vuln-url {
+              type inet:uri;
+              description
+                "A statically located URI.";
+             }
+           }
+         }
+        case vuln-local-well-known {
+          leaf vuln-local-well-known {
+            type enumeration {
+            enum http {
+              description "Use http (insecure) to retrieve vulnerability infomration.";
+            }
+            enum https {
+              description "Use https (secure) to retrieve vulnerability information.";
+            }
+            enum coap {
+              description "Use COAP (insecure) to retrieve vulnerability information";
+            }
+            enum coaps {
+              description "Use COAPS (secure) to retrieve vulnerability information";
+            }
+            enum openc2 {
+              description "Use OpenC2 endpoint.  
+                           This is https://{host}/.well-known/openc2";
+            }
+          }
+	  description "What communmcation protocol to use.";
+         }
+	}
+        case vuln-contact-info {
+          leaf contact-uri {
             type inet:uri;
             mandatory true;
             description
-              "A link to the OpenC2 https RESTful
-                 \t mapping.  The OpenC2 protocol is then
-                      used to retrieve the SBOM";
+              "This MUST be either a tel, http, https, or
+               mailto uri schema that customers can use to
+               contact someone for vulnerability information.";
+            }
           }
         }
       }
     }
-  }
 
   augment "/mud:mud" {
     description
-      "Add extension for SBOMs.";
-    uses mud-sbom-extension;
+      "Add extension for software transparency.";
+    uses transparency-extension;
   }
 }
 <CODE ENDS>
-~~~~~~~~~
+~~~~~~
 
 
 Examples
 ========
+
+XXX OUT OF DATE XXX
 
 In this example MUD file that uses a cloud service, the Frobinator
 presents a location of the SBOM in a URL.  Note, the ACLs in a MUD
@@ -377,7 +494,7 @@ Without ACLS
     "sboms" : { "sbom" : [
       {
          "version-info" : "FrobOS Release 1.1",
-         "sbom-url" : "https://frob.example.com/sboms/f20001.1",
+         "sbom-url" : "https://frob.example.com/sboms/f20001.1"
       }
     ]
     }
@@ -403,8 +520,8 @@ Located on the Device
     "extensions" : [ 
        "sbom"
       ],
-    "sboms" : "sbom" : {
-         "sbom-local" : "coaps:///.well-known/sbom",
+    "sboms" :  {
+         "sbom-local" : []
       }
   }
 }
@@ -428,10 +545,9 @@ SBOM Obtained from Contact Information
     "extensions" : [ 
        "sbom"
       ],
-    "sboms" : { "sbom" : {
-         "contact-uri" : "mailto:sbom-requst@example.com",
+    "sboms" : {
+         "contact-uri" : "mailto:sbom-requst@example.com"
       }
-    }
   }
 }
 ~~~~~~~~
@@ -457,9 +573,9 @@ With ACLS
     "sboms" : "sbom" : [
       {
          "version-info" : "FrobOS Release 1.1",
-         "sbom-url" : "https://frob.example.com/sboms/f20001.1",
-      },
-    ],
+         "sbom-url" : "https://frob.example.com/sboms/f20001.1"
+      }
+    ]
    },
     "from-device-policy": {
       "access-lists": {
