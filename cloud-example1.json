@@ -1,0 +1,26 @@
+{
+  "ietf-mud:mud": {
+    "mud-version": 1,
+    "extensions": [
+      "transparency"
+    ],
+    "transparency": {
+      "sboms": [
+        {
+          "version-info": "ExOS1.1",
+          "sbom-url": "https://iot-device.example.com/info/modelX/sbom.json"
+        }
+      ],
+      "vuln-url": "https://iot-device.example.com/info/modelX/csaf.json"
+    },
+    "mud-url": "https://iot-device.example.com/modelX.json",
+    "mud-signature": "https://iot-device.example.com/modelX.p7s",
+    "last-update": "2021-07-09T05:57:58+00:00",
+    "cache-validity": 48,
+    "is-supported": true,
+    "systeminfo": "retrieving vuln and SBOM info via a cloud service",
+    "mfg-name": "Example, Inc.",
+    "documentation": "https://iot-device.example.com/doc/modelX",
+    "model-name": "modelX"
+  }
+}
