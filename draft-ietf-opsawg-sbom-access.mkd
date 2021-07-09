@@ -123,7 +123,7 @@ information.
 
 Note that SBOMs may also carry other information, the most common
 being any licensing terms.  Because this specification is neutral
-regading content, it is left for format developers such as the Linux
+regarding content, it is left for format developers such as the Linux
 Foundation, OASIS, and ISO to decide what attributes they will support.
 
 This memo specifies means by which both SBOMs and vulnerability
@@ -196,7 +196,7 @@ A separate use case may be addressed in future versions of this document:
 The reason why this use case isn’t addressed here is that it may be
 better addressed inline within HTML.  Further discussion is required.
 
-How This Information Is Retreived
+How This Information Is Retrieved
 ---------------------------------
 
 For devices that can emit a URL or can establish a well-known URI, the
