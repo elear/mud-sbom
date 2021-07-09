@@ -121,6 +121,11 @@ model specified in this memo.  One can provide only an SBOM, only
 vulnerability information, or both an SBOM and vulnerability
 information.
 
+Note that SBOMs may also carry other information, the most common
+being any licensing terms.  Because this specification is neutral
+regading content, it is left for format developers such as the Linux
+Foundation, OASIS, and ISO to decide what attributes they will support.
+
 This memo specifies means by which both SBOMs and vulnerability
 information can be advertised and retrieved through the use of a YANG
 augmentation of the Manufacturer User Description (MUD) model
