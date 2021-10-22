@@ -11,7 +11,7 @@
      ],
      "spdx-tag": "0BSD"
    },
-   "transparency": {
+   "ietf-mud-transparency:transparency": {
      "sbom-local-well-known": "https",
      "vuln-url": "https://iot-device.example.com/info/modelX/csaf.json"
    },

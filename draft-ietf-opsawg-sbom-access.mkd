@@ -1,7 +1,7 @@
 ---
 title: Discovering and Retrieving Software Transparency and Vulnerability Information
 abbrev: Discovering SBOMs and Vuln. Info
-docname: draft-ietf-opsawg-sbom-access-02
+docname: draft-ietf-opsawg-sbom-access-04
 category: std
 ipr: trust200902
 keyword: Internet-Draft
@@ -34,6 +34,7 @@ author:
 normative:
    RFC2119:
    RFC8174:
+   RFC6991:
 
 informative:
    SPDX:
@@ -80,7 +81,7 @@ informative:
 To improve cybersecurity posture, automation is necessary to locate
 what software is running on a device, whether that software has known
 vulnerabilities, and what, if any recommendations suppliers may have.
-This memo specifies a model to provide access this information.  It
+This memo specifies a model to provide access to this information.  It
 may optionally be discovered through manufacturer usage descriptions.
 
 --- middle
@@ -98,7 +99,7 @@ Put simply, we seek to answer two classes of questions **at scale**:
  - Which devices in a particular environment contain vulnerabilities
    that require some action?
 
-Software bills of material (SBOMs) are descriptions of what software,
+Software bills of materials (SBOMs) are descriptions of what software,
 including versioning and dependencies, a device contains.  There
 are different SBOM formats such as Software Package Data Exchange
 {{SPDX}} or CycloneDX{{CycloneDX12}}.
@@ -243,10 +244,9 @@ The following is discussion to be removed at time of RFC publication.
 The .well-known/transparency endpoint set
 =================================
 
-Three well known endpoints are defined:
+Two well known endpoints are defined:
 
  - "/.well-known/sbom" retrieves an SBOM.
- - "/.well-known/vuln" retrieves vulnerability information.
  - "/.well-known/openc2" is the HTTPS binding to OpenC2.
  
 As discussed previously, the precise format of a response is based on
@@ -273,7 +273,7 @@ The mud-sbom augmentation to the MUD YANG model
 ============================
 
 ~~~~~
-<CODE BEGINS>file "ietf-mud-transparency@2021-07-06.yang"
+<CODE BEGINS>file "ietf-mud-transparency@2021-10-22.yang"
 {::include ietf-mud-transparency.yang}
 <CODE ENDS>
 ~~~~~~
@@ -357,7 +357,7 @@ servers.
 
 Another risk is a skew in the SBOM listing and the actual software
 inventory of a device/container. For example, a manufacturer may
-update the SBOM on its server, but an individual device has not be
+update the SBOM on its server, but an individual device has not been
 upgraded yet.  This may result in an incorrect policy being applied to
 a device. A unique mapping of a device's firmware version and its SBOM
 can minimize this risk.
@@ -369,7 +369,7 @@ Vulnerability information is generally made available to such databases
 as NIST's National Vulnerability Database.  It is possible that vendor
 may wish to release information early to some customers.  We do not
 discuss here whether that is a good idea, but if it is employed, then
-appropriate access controls and authoration would be applied to the
+appropriate access controls and authorization would be applied to the
 vulnerability resource.
 
 IANA Considerations
@@ -405,11 +405,6 @@ The following well known URIs are requested in accordance with
   Change controller: "IETF"
   Specification document: This memo
   Related information:  OpenC2 Project
-
-  URI suffix: "vuln"
-  Change controller: "IETF"
-  Specification document: This memo
-  Related information:  OASIS.ORG's CSAF project
 
 ~~~~~~
 

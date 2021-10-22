@@ -4,7 +4,7 @@
   "extensions": [
     "transparency"
   ],
-  "transparency": {
+  "ietf-mud-transparency:transparency": {
     "contact-info": "https://iot-device.example.com/contact-info.html",
     "vuln-url": "https://iot-device.example.com/info/modelX/csaf.json"
   },
