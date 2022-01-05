@@ -1,7 +1,7 @@
 ---
 title: Discovering and Retrieving Software Transparency and Vulnerability Information
 abbrev: Discovering SBOMs and Vuln. Info
-docname: draft-ietf-opsawg-sbom-access-03
+docname: draft-ietf-opsawg-sbom-access-04
 category: std
 ipr: trust200902
 keyword: Internet-Draft
@@ -75,7 +75,6 @@ informative:
         ins: O. Santos
         name: Omar Santos
         role: editor
-        email: os@cisco.com
         org: OASIS
      target: https://docs.oasis-open.org/csaf/csaf-cvrf/v1.2/csaf-cvrf-v1.2.pdf
      date: September, 2017
