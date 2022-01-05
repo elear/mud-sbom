@@ -1,7 +1,7 @@
 ---
 title: Discovering and Retrieving Software Transparency and Vulnerability Information
 abbrev: Discovering SBOMs and Vuln. Info
-docname: draft-ietf-opsawg-sbom-access-04
+docname: draft-ietf-opsawg-sbom-access-03
 category: std
 ipr: trust200902
 keyword: Internet-Draft
@@ -37,6 +37,13 @@ normative:
    RFC6991:
 
 informative:
+   EO2021:
+     title: Executive Order 14028, Improving the Nations Cybersecurity
+     author:
+       ins: J. Biden
+       Name: President Joseph Biden
+       org: United States Of America
+     date: May, 2021
    SPDX:
      title: SPDX Specification 2.1
      author:
@@ -70,7 +77,7 @@ informative:
         role: editor
         email: os@cisco.com
         org: OASIS
-     target: http://docs.oasis-open.org/csaf/csaf-cvrf/v1.2/csaf-cvrf-v1.2.pdf
+     target: https://docs.oasis-open.org/csaf/csaf-cvrf/v1.2/csaf-cvrf-v1.2.pdf
      date: September, 2017
      
         
@@ -91,13 +98,16 @@ Introduction
 
 A number of activities have been working to improve visibility to what
 software is running on a system, and what vulnerabilities that
-software may have.
+software may have{{EO2021}}.
 
 Put simply, we seek to answer two classes of questions **at scale**:
 
  - Is this system vulnerable to a particular vulnerability?
  - Which devices in a particular environment contain vulnerabilities
    that require some action?
+
+This memo doesn't specify the format of this information, but rather
+only how to locate and retrieve these objects.
 
 Software bills of materials (SBOMs) are descriptions of what software,
 including versioning and dependencies, a device contains.  There
@@ -117,21 +127,27 @@ and a vulnerability report may be used to indicate what if any
 versions of software correct that vulnerability, or whether the system
 exercises the vulnerable code at all.
 
-Both classes of information elements are optional under the
-model specified in this memo.  One can provide only an SBOM, only
+Both classes of information elements are optional under the model
+specified in this memo.  One can provide only an SBOM, only
 vulnerability information, or both an SBOM and vulnerability
 information.
 
-Note that SBOMs may also carry other information, the most common
-being any licensing terms.  Because this specification is neutral
-regarding content, it is left for format developers such as the Linux
-Foundation, OASIS, and ISO to decide what attributes they will support.
+Note that SBOM formats may also carry other information, the most
+common being any licensing terms.  Because this specification is
+neutral regarding content, it is left for format developers such as
+the Linux Foundation, OASIS, and ISO to decide what attributes they
+will support.
 
-This memo specifies means by which both SBOMs and vulnerability
-information can be advertised and retrieved through the use of a YANG
-augmentation of the Manufacturer User Description (MUD) model
-{{!RFC8520}}.  Note that the schema creates a grouping that can also
-be used independently of MUD.
+This memo does not specify how vulnerability information may be
+retrieved directly from the endpoint.  That's because vulnerability
+information changes occur at different rates to software updates.
+However, some SBOM formats may also contain vulnerability information.
+
+SBOMs and vulnerability information are advertised and retrieved
+through the use of a YANG augmentation of the Manufacturer User
+Description (MUD) model {{!RFC8520}}.  Note that the schema creates a
+grouping that can also be used independently of MUD.  Moreover, other
+MUD features, such as access controls, needn't be present.
 
 The mechanisms specified in this document are meant to satisfy several
 use cases:
@@ -160,7 +176,7 @@ interfaces as well.
 
 In the second case, when a device does not have an appropriate
 retrieval interface, but one is directly available from the
-manufacturer, a URI to that information must be discovered.
+manufacturer, a URI to that information MUST be discovered.
 
 In the third case, a supplier may wish to make an SBOM or
 vulnerability information available under certain circumstances, and
@@ -343,7 +359,7 @@ vulnerability information, and apply ACLs, as appropriate.
 
 Security Considerations
 =======================
-SBOMs provide an inventory of software.  If firmware is available to
+SBOMs provide an inventory of software.  If software is available to
 an attacker, the attacker may well already be able to derive this very
 same software inventory.  Manufacturers MAY restrict access to SBOM
 information using appropriate authorization semantics within HTTP.  In
@@ -359,7 +375,7 @@ Another risk is a skew in the SBOM listing and the actual software
 inventory of a device/container. For example, a manufacturer may
 update the SBOM on its server, but an individual device has not been
 upgraded yet.  This may result in an incorrect policy being applied to
-a device. A unique mapping of a device's firmware version and its SBOM
+a device. A unique mapping of a device's software version and its SBOM
 can minimize this risk.
 
 To further mitigate attacks against a device, manufacturers SHOULD
@@ -387,6 +403,22 @@ extensions registry as follows:
   Standard reference: This document
 
 ~~~~~~~
+
+YANG Registration
+-----------------
+
+The following YANG module should be registered in the "YANG Module
+Names" registry:
+
+~~~~~
+   Name: ietf-mud
+   URN: urn:ietf:params:xml:ns:yang:ietf-mud-transparency
+   Prefix: mudtx
+   Registrant contact: The IESG
+   Reference: This memo
+~~~~~
+
+
 
 Well-Known Prefix
 -----------------
