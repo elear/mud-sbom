@@ -41,7 +41,7 @@ informative:
      title: Executive Order 14028, Improving the Nations Cybersecurity
      author:
        ins: J. Biden
-       Name: President Joseph Biden
+       name: President Joseph Biden
        org: United States Of America
      date: May, 2021
    SPDX:
@@ -257,7 +257,7 @@ The following is discussion to be removed at time of RFC publication.
    (e.g. an IDevID cert)?
 
 
-The .well-known/transparency endpoint set
+The well-known transparency endpoint set
 =================================
 
 Two well known endpoints are defined:
@@ -440,12 +440,20 @@ The following well known URIs are requested in accordance with
 
 ~~~~~~
 
+Acknowledgments
+===============
+
+Thanks to Russ Housley, Dick Brooks, Tom Petch, Nicolas Comstedt, who
+provided revew comments.
 
 --- back
 
 
 Changes from Earlier Versions
 =============================
+
+Draft -04:
+  * Address review comments
 
 Draft -02:
 
