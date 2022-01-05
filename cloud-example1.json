@@ -2,20 +2,22 @@
   "ietf-mud:mud": {
     "mud-version": 1,
     "extensions": [
+      "ol",
       "transparency"
     ],
-    "ietf-mud-transparency:transparency": {
-      "sboms": [
-        {
-          "version-info": "ExOS1.1",
-          "sbom-url": "https://iot.example.com/info/modelX/sbom.json"
-        }
+    "ol": {
+      "owners": [
+        "Copyright (c) Example, Inc. 2022. All Rights Reserved"
       ],
+      "spdx-tag": "0BSD"
+    },
+    "mudtx:transparency": {
+      "sbom-local-well-known": "https",
       "vuln-url": "https://iot.example.com/info/modelX/csaf.json"
     },
     "mud-url": "https://iot.example.com/modelX.json",
     "mud-signature": "https://iot.example.com/modelX.p7s",
-    "last-update": "2021-07-09T05:57:58+00:00",
+    "last-update": "2022-01-05T13:29:12+00:00",
     "cache-validity": 48,
     "is-supported": true,
     "systeminfo": "retrieving vuln and SBOM info via a cloud service",

@@ -2,20 +2,22 @@
   "ietf-mud:mud": {
     "mud-version": 1,
     "extensions": [
+      "ol",
       "transparency"
     ],
-    "ietf-mud-transparency:transparency": {
-      "sboms": [
-        {
-          "version-info": "ExOS1.1",
-          "sbom-url": "https://iot.example.com/info/modelX/sbom.json"
-        }
+    "ol": {
+      "owners": [
+        "Copyright (c) Example, Inc. 2022. All Rights Reserved"
       ],
+      "spdx-tag": "0BSD"
+    },
+    "mudtx:transparency": {
+      "sbom-local-well-known": "https",
       "vuln-url": "https://iot.example.com/info/modelX/csaf.json"
     },
     "mud-url": "https://iot.example.com/modelX.json",
     "mud-signature": "https://iot.example.com/modelX.p7s",
-    "last-update": "2021-07-09T06:19:39+00:00",
+    "last-update": "2022-01-05T13:30:31+00:00",
     "cache-validity": 48,
     "is-supported": true,
     "systeminfo": "retrieving vuln and SBOM info via a cloud service",
@@ -26,7 +28,7 @@
       "access-lists": {
         "access-list": [
           {
-            "name": "mud-15060-v4fr"
+            "name": "mud-65443-v4fr"
           }
         ]
       }
@@ -35,7 +37,7 @@
       "access-lists": {
         "access-list": [
           {
-            "name": "mud-15060-v4to"
+            "name": "mud-65443-v4to"
           }
         ]
       }
@@ -44,7 +46,7 @@
   "ietf-access-control-list:acls": {
     "acl": [
       {
-        "name": "mud-15060-v4to",
+        "name": "mud-65443-v4to",
         "type": "ipv4-acl-type",
         "aces": {
           "ace": [
@@ -52,7 +54,7 @@
               "name": "cl0-todev",
               "matches": {
                 "ipv4": {
-                  "ietf-acldns:src-dnsname": "cloud.example.com"
+                  "ietf-acldns:src-dnsname": "iotserver.example.com"
                 }
               },
               "actions": {
@@ -63,7 +65,7 @@
         }
       },
       {
-        "name": "mud-15060-v4fr",
+        "name": "mud-65443-v4fr",
         "type": "ipv4-acl-type",
         "aces": {
           "ace": [
@@ -71,7 +73,7 @@
               "name": "cl0-frdev",
               "matches": {
                 "ipv4": {
-                  "ietf-acldns:dst-dnsname": "cloud.example.com"
+                  "ietf-acldns:dst-dnsname": "iotserver.example.com"
                 }
               },
               "actions": {
