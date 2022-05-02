@@ -1,7 +1,7 @@
 ---
 title: Discovering and Retrieving Software Transparency and Vulnerability Information
 abbrev: Discovering SBOMs and Vuln. Info
-docname: draft-ietf-opsawg-sbom-access-04
+docname: draft-ietf-opsawg-sbom-access-05
 category: std
 ipr: trust200902
 keyword: Internet-Draft
@@ -35,7 +35,12 @@ normative:
    RFC2119:
    RFC8174:
    RFC6991:
-
+   RFC6241:
+   RFC6242:
+   RFC8040:
+   RFC8341:
+   RFC8446:
+   
 informative:
    EO2021:
      title: Executive Order 14028, Improving the Nations Cybersecurity
@@ -45,10 +50,13 @@ informative:
        org: United States Of America
      date: May, 2021
    SPDX:
-     title: SPDX Specification 2.1
+     title: SPDX Specification V2.2.1
      author:
        org: The Linux Foundation
-     date: 2016
+     date: 2021
+     seriesinfo:
+       ISO/IEC: 5962:2021
+     target: https://www.iso.org/standard/81870.html
    CycloneDX12:
      title: CycloneDX XML Reference v1.2
      author:
@@ -115,9 +123,9 @@ are different SBOM formats such as Software Package Data Exchange
 
 System vulnerabilities may similarly be described using several data
 formats, including the aforementioned CycloneDX, Common Vulnerability
-Reporting Framework {{CVRF}}, the Common Security Advisory Format {{CSAF}}.
-This information is typically used to report to customers the state of
-a system.
+Reporting Framework {{CVRF}}, the Common Security Advisory Format
+{{CSAF}}.  This information is typically used to report to
+administrators the state of a system.
 
 These two classes of information can be used in concert.  For
 instance, a network management tool may discover that a system makes
@@ -195,23 +203,6 @@ NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED",
 described in BCP 14 {{RFC2119}} {{RFC8174}} when, and only when, they
 appear in all capitals, as shown here.
 
-Cases Not Addressed
--------------------
-\[ This section to be removed prior to publication \]
-
-A separate use case may be addressed in future versions of this document:
-
-* Related to the application layer, software as a service may
-  involve multiple backend systems, depending on many factors.
-  One example might be a large cloud-based service that offers
-  spreadsheets, email, and document authoring and management.
-  Depending on what service is being used, a different set of
-  back end services may in turn be invoking different software
-  that should be listed.
-
-The reason why this use case isn’t addressed here is that it may be
-better addressed inline within HTML.  Further discussion is required.
-
 How This Information Is Retrieved
 ---------------------------------
 
@@ -283,6 +274,8 @@ This is done as follows:
 ~~~~~~~~~
 {::include yang.tree}
 ~~~~~~~~~
+
+See {{?RFC8407}} for a description of YANG trees.
 
 The mud-sbom augmentation to the MUD YANG model
 ============================
@@ -358,6 +351,55 @@ vulnerability information, and apply ACLs, as appropriate.
 
 Security Considerations
 =======================
+
+The YANG module specified in this document defines a schema for data
+that is designed to be accessed via network management protocols such
+as NETCONF {{RFC6241}} or RESTCONF {{RFC8040}}. The lowest NETCONF layer
+is the secure transport layer, and the mandatory-to-implement secure
+transport is Secure Shell (SSH) {{RFC6242}}. The lowest RESTCONF layer
+is HTTPS, and the mandatory-to-implement secure transport is TLS
+{{RFC8446}}.
+
+N.B., for MUD, the mandatory method of retrieval is TLS.
+
+The Network Configuration Access Control Model (NACM) {{RFC8341}}
+provides the means to restrict access for particular NETCONF or
+RESTCONF users to a preconfigured subset of all available NETCONF or
+RESTCONF protocol operations and content.
+
+There are a number of data nodes defined in this YANG module that are
+writable/creatable/deletable (i.e., config true, which is the
+default). These data nodes may be considered sensitive or vulnerable
+in some network environments. Write operations (e.g., edit-config) to
+these data nodes without proper protection can have a negative effect
+on network operations. These are the subtrees and data nodes and their
+sensitivity/vulnerability:
+
+The ietf-mud-transparency module has no operational impact on the
+element itself, and is used to discover state information that may be
+available on or off the element.  In as much as the module itself is
+made writeable, this only indicates a change in how to retrieve
+read-only elements.  There is no means, for instance, to upload an
+SBOM.  Additional risks are discussed below, and are applicable to all
+nodes within the transparency container.
+
+If an attacker modifies the elements, they may misdirect automation to
+retrieve a different set of URLs than was intended by the designer.  This
+in turn leads to two specific sets of risks:
+
+ - the information retrieved would be false.
+ - the URLs themselves point to malware.
+
+To address either risk, any change in a URL, and in particular to the
+authority section, should be treated with some suspicion.  One mitigation
+would be to test any cloud-based URL against a reputation service.
+
+Some of the readable data nodes in this YANG module may be considered
+sensitive or vulnerable in some network environments. It is thus
+important to control read access (e.g., via get, get-config, or
+notification) to these data nodes. These are the subtrees and data
+nodes and their sensitivity/vulnerability:
+
 SBOMs provide an inventory of software.  If software is available to
 an attacker, the attacker may well already be able to derive this very
 same software inventory.  Manufacturers MAY restrict access to SBOM
@@ -378,13 +420,13 @@ a device. A unique mapping of a device's software version and its SBOM
 can minimize this risk.
 
 To further mitigate attacks against a device, manufacturers SHOULD
-recommend access controls through the normal MUD mechanism.
+recommend access controls.
 
 Vulnerability information is generally made available to such databases
 as NIST's National Vulnerability Database.  It is possible that vendor
 may wish to release information early to some customers.  We do not
 discuss here whether that is a good idea, but if it is employed, then
-appropriate access controls and authorization would be applied to the
+appropriate access controls and authorization SHOULD be applied to the
 vulnerability resource.
 
 IANA Considerations
@@ -443,7 +485,7 @@ Acknowledgments
 ===============
 
 Thanks to Russ Housley, Dick Brooks, Tom Petch, Nicolas Comstedt, who
-provided revew comments.
+provided review comments.
 
 --- back
 

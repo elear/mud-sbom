@@ -54,7 +54,8 @@ module ietf-mud-transparency {
 
   grouping transparency-extension {
     description
-      "Transparency extension grouping";
+      "This grouping provides a means to describe the location of
+       software bills of material and vulnerability descriptions.";
     container transparency {
       description
         "container of methods to get an SBOM.";
@@ -65,8 +66,8 @@ module ietf-mud-transparency {
           list sboms {
             key "version-info";
             description
-              "A list of SBOMs tied to different s/w
-               or h/w versions.";
+              "A list of SBOMs tied to different software
+               or hardware versions.";
             leaf version-info {
               type string;
               description
@@ -75,7 +76,7 @@ module ietf-mud-transparency {
             leaf sbom-url {
               type inet:uri;
               description
-                "A statically located URI.";
+                "A statically located URL.";
             }
           }
         }
@@ -85,7 +86,9 @@ module ietf-mud-transparency {
               enum http {
                 description
                   "Use http (insecure) to retrieve 
-                   SBOM information.";
+                   SBOM information.  This method is NOT RECOMMENDED,
+                   but may be unavoidable for certain classes of
+                   deployment, where TLS has not or cannot be implemented";
               }
               enum https {
                 description
@@ -93,7 +96,9 @@ module ietf-mud-transparency {
               }
               enum coap {
                 description
-                  "Use COAP (insecure) to retrieve SBOM";
+                  "Use COAP (insecure) to retrieve SBOM.  This method
+                  is NOT RECOMMENDED, although it may be unavoidable
+                  for certain classes of implementations/deployments.";
               }
               enum coaps {
                 description
