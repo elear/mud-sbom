@@ -1,7 +1,8 @@
 ---
 title: Discovering and Retrieving Software Transparency and Vulnerability Information
 abbrev: Discovering SBOMs and Vuln. Info
-docname: draft-ietf-opsawg-sbom-access-05
+docname: draft-ietf-opsawg-sbom-access-10
+submissionType: IETF
 category: std
 ipr: trust200902
 keyword: Internet-Draft
@@ -33,15 +34,17 @@ author:
 
 normative:
    RFC2119:
-   RFC8174:
-   RFC6991:
    RFC6241:
    RFC6242:
+   RFC6991:
+   RFC7252:
    RFC8040:
    RFC8341:
    RFC8446:
+   RFC8174:
    
 informative:
+   RFC9110:
    EO2021:
      title: Executive Order 14028, Improving the Nations Cybersecurity
      author:
@@ -50,27 +53,16 @@ informative:
        org: United States Of America
      date: May, 2021
    SPDX:
-     title: SPDX Specification V2.2.1
+     title: SPDX Specification V2.3
      author:
        org: The Linux Foundation
-     date: 2021
-     seriesinfo:
-       ISO/IEC: 5962:2021
-     target: https://www.iso.org/standard/81870.html
+     date: 2022
+     target: https://spdx.github.io/spdx-spec/v2.3/
    CycloneDX12:
      title: CycloneDX XML Reference v1.2
      author:
        org: cylonedx.org
      date: May, 2020
-   OpenC2:
-     title: Specification for Transfer of OpenC2 Messages via HTTPS Version 1.0
-     author:
-        ins: D. Lemire
-        name: David Lemire
-        role: editor
-        org: OASIS
-     target: https://docs.oasis-open.org/openc2/open-impl-https/v1.0/open-impl-https-v1.0.html
-     date: 11 July 2019
    CSAF:
      title: Common Security Advisory Format
      author:
@@ -114,7 +106,9 @@ Put simply, we seek to answer two classes of questions **at scale**:
    that require some action?
 
 This memo doesn't specify the format of this information, but rather
-only how to locate and retrieve these objects.
+only how to locate and retrieve these objects.  That is, the model is
+a discovery mechanism, and on its own provides no access to the
+underlying data.
 
 Software bills of materials (SBOMs) are descriptions of what software,
 including versioning and dependencies, a device contains.  There
@@ -177,8 +171,8 @@ three ways:
 * through some form of out-of-band contact with the supplier.
 
 In the first case, devices will have interfaces that permit direct
-retrieval.  Examples of these interfaces might be an HTTP, COAP
-or {{OpenC2}} endpoint for retrieval.  There may also be private
+retrieval.  Examples of these interfaces might be an HTTP {{RFC9110}},
+or COAP {{RFC7252}} endpoint for retrieval.  There may also be private
 interfaces as well.
 
 In the second case, when a device does not have an appropriate
@@ -250,10 +244,9 @@ The following is discussion to be removed at time of RFC publication.
 The well-known transparency endpoint set
 =================================
 
-Two well known endpoints are defined:
+Two well known endpoint is defined:
 
  - "/.well-known/sbom" retrieves an SBOM.
- - "/.well-known/openc2" is the HTTPS binding to OpenC2.
  
 As discussed previously, the precise format of a response is based on
 the Content-type provided.
@@ -275,13 +268,13 @@ This is done as follows:
 {::include yang.tree}
 ~~~~~~~~~
 
-See {{?RFC8407}} for a description of YANG trees.
+See {{?RFC8340}} for a description of YANG trees.
 
 The mud-sbom augmentation to the MUD YANG model
 ============================
 
 ~~~~~
-<CODE BEGINS>file "ietf-mud-transparency@2021-10-22.yang"
+<CODE BEGINS>file "ietf-mud-transparency@2022-09-02.yang"
 {::include ietf-mud-transparency.yang}
 <CODE ENDS>
 ~~~~~~
@@ -369,10 +362,9 @@ RESTCONF protocol operations and content.
 
 There are a number of data nodes defined in this YANG module that are
 writable/creatable/deletable (i.e., config true, which is the
-default). These data nodes may be considered sensitive or vulnerable
-in some network environments. Write operations (e.g., edit-config) to
-these data nodes without proper protection can have a negative effect
-on network operations. These are the subtrees and data nodes and their
+default).  Write operations (e.g., edit-config) to these data nodes
+without proper protection can have a negative effect on network
+operations. These are the subtrees and data nodes and their
 sensitivity/vulnerability:
 
 The ietf-mud-transparency module has no operational impact on the
@@ -402,15 +394,15 @@ nodes and their sensitivity/vulnerability:
 
 SBOMs provide an inventory of software.  If software is available to
 an attacker, the attacker may well already be able to derive this very
-same software inventory.  Manufacturers MAY restrict access to SBOM
-information using appropriate authorization semantics within HTTP.  In
-particular, if a system attempts to retrieve an SBOM via HTTP and the
-client is not authorized, the server MUST produce an appropriate
-error, with instructions on how to register a particular client.  One
-example may be to issue a certificate to the client for this purpose
-after a registration process has taken place.  Another example would
-involve the use of OAUTH in combination with a federations of SBOM
-servers.
+same software inventory.  The servers that offer the data MAY restrict
+access to SBOM information using appropriate authorization semantics
+within HTTP.  In particular, if a system attempts to retrieve an SBOM
+via HTTP and the client is not authorized, the server MUST produce an
+appropriate error, with instructions on how to register a particular
+client.  One example may be to issue a certificate to the client for
+this purpose after a registration process has taken place.  Another
+example would involve the use of OAUTH in combination with a
+federations of SBOM servers.
 
 Another risk is a skew in the SBOM listing and the actual software
 inventory of a device/container. For example, a manufacturer may
@@ -459,12 +451,18 @@ Names" registry:
    Reference: This memo
 ~~~~~
 
+The following XML registration is requested:
 
+~~~~~
+   URI: urn:ietf:params:xml:ns:yang:ietf-mud-transparency
+   Registrant Contact: IESG
+   XML: None.  Namespace URIs do not represent an XML specification.
+~~~~~
 
 Well-Known Prefix
 -----------------
 
-The following well known URIs are requested in accordance with
+The following well known URI is requested in accordance with
 {{!RFC8615}}:
 
 ~~~~~~
@@ -472,14 +470,9 @@ The following well known URIs are requested in accordance with
   URI suffix: "sbom"
   Change controller: "IETF"
   Specification document: This memo
-  Related information:  See ISO/IEC 19970-2 and SPDX.org
+  Related information:  See ISO/IEC 5962:2021 and SPDX.org
 
-  URI suffix: "openc2"
-  Change controller: "IETF"
-  Specification document: This memo
-  Related information:  OpenC2 Project
-
-~~~~~~
+ ~~~~~~
 
 Acknowledgments
 ===============
