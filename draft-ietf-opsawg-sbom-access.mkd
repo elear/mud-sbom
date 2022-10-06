@@ -1,7 +1,7 @@
 ---
 title: Discovering and Retrieving Software Transparency and Vulnerability Information
 abbrev: Discovering SBOMs and Vuln. Info
-docname: draft-ietf-opsawg-sbom-access-10
+docname: draft-ietf-opsawg-sbom-access-11
 submissionType: IETF
 category: std
 ipr: trust200902
@@ -229,18 +229,6 @@ nodes MUST indicate that.  Network management systems retrieving
 this information MUST take note that the identical resource is being
 retrieved rather than retrieving it twice.
 
-Discussion points
------------------
-The following is discussion to be removed at time of RFC publication.
-
- * Is the model structured correctly?
- * Are there other retrieval mechanisms that need to be specified?
- * Do we need to be more specific in how to authenticate and retrieve
-   SBOMs?
- * What are the implications if the MUD URL is an extension in a certificate
-   (e.g. an IDevID cert)?
-
-
 The well-known transparency endpoint set
 =================================
 
@@ -389,15 +377,16 @@ would be to test any cloud-based URL against a reputation service.
 Some of the readable data nodes in this YANG module may be considered
 sensitive or vulnerable in some network environments. It is thus
 important to control read access (e.g., via get, get-config, or
-notification) to these data nodes. These are the subtrees and data
-nodes and their sensitivity/vulnerability:
+notification) to these data nodes.  
 
 SBOMs provide an inventory of software.  If software is available to
 an attacker, the attacker may well already be able to derive this very
-same software inventory.  The servers that offer the data MAY restrict
-access to SBOM information using appropriate authorization semantics
-within HTTP.  In particular, if a system attempts to retrieve an SBOM
-via HTTP and the client is not authorized, the server MUST produce an
+same software inventory.  When this information resides on the
+endpoint itself, the endpoint SHOULD NOT provide unrestricted access
+by default.  Other servers that offer the data MAY restrict access to
+SBOM information using appropriate authorization semantics within
+HTTP.  In particular, if a system attempts to retrieve an SBOM via
+HTTP and the client is not authorized, the server MUST produce an
 appropriate error, with instructions on how to register a particular
 client.  One example may be to issue a certificate to the client for
 this purpose after a registration process has taken place.  Another
@@ -472,7 +461,7 @@ The following well known URI is requested in accordance with
   Specification document: This memo
   Related information:  See ISO/IEC 5962:2021 and SPDX.org
 
- ~~~~~~
+~~~~~~
 
 Acknowledgments
 ===============
