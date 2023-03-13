@@ -1,7 +1,7 @@
 ---
 title: Discovering and Retrieving Software Transparency and Vulnerability Information
 abbrev: Discovering SBOMs and Vuln. Info
-docname: draft-ietf-opsawg-sbom-access-11
+docname: draft-ietf-opsawg-sbom-access-16
 submissionType: IETF
 category: std
 ipr: trust200902
@@ -37,6 +37,7 @@ normative:
    RFC6241:
    RFC6242:
    RFC6991:
+   RFC7231:
    RFC7252:
    RFC8040:
    RFC8341:
@@ -61,34 +62,46 @@ informative:
    CycloneDX12:
      title: CycloneDX XML Reference v1.2
      author:
-       org: cylonedx.org
+       org: cyclonedx.org
      date: May, 2020
    CSAF:
-     title: Common Security Advisory Format
+     title: Common Security Advisory Framework Version 2.0
      author:
+      -
+        ins: L. Rock
+        name: Langley Rock
+        role: editor
         org: OASIS
-     target: https://github.com/oasis-tcs/csaf
-     date: July, 2021
+      -
+        ins: S. Hagen
+        name: Stefan Hagen
+        role: editor
+        org: OASIS
+      -
+        ins: T. Schmidt
+        name: Thomas Schmidt
+        role: editor
+        org: OASIS
+     target: https://docs.oasis-open.org/csaf/csaf/v2.0/csaf-v2.0.html
+     date: November, 2022
    CVRF:
      title: Common Vulnerability Reporting Framework (CVRF) Version 1.2
      author:
-        ins: O. Santos
-        name: Omar Santos
+        ins: S. Hagen
+        name: Stefan Hagen
         role: editor
         org: OASIS
      target: https://docs.oasis-open.org/csaf/csaf-cvrf/v1.2/csaf-cvrf-v1.2.pdf
      date: September, 2017
-     
-        
-       
      
 --- abstract
 
 To improve cybersecurity posture, automation is necessary to locate
 what software is running on a device, whether that software has known
 vulnerabilities, and what, if any recommendations suppliers may have.
-This memo specifies a model to provide access to this information.  It
-may optionally be discovered through manufacturer usage descriptions.
+This memo extends the MUD YANG model to provide the locations of software
+bills of materials (SBOMS) and to vulnerability information.
+
 
 --- middle
 
@@ -150,7 +163,7 @@ Description (MUD) model {{!RFC8520}}.  Note that the schema creates a
 grouping that can also be used independently of MUD.  Moreover, other
 MUD features, such as access controls, needn't be present.
 
-The mechanisms specified in this document are meant to satisfy several
+The mechanisms specified in this document are meant to address two
 use cases:
 
 * A network-layer management system retrieving information from an IoT
@@ -164,22 +177,22 @@ use cases:
   beyond the scope of this memo.
 
 To satisfy these two key use cases, objects may be found in one of
-three ways:
+three methods:
 
 * on devices themselves
 * on a web site (e.g., via URI)
 * through some form of out-of-band contact with the supplier.
 
-In the first case, devices will have interfaces that permit direct
-retrieval.  Examples of these interfaces might be an HTTP {{RFC9110}},
-or COAP {{RFC7252}} endpoint for retrieval.  There may also be private
-interfaces as well.
+Using the first method, devices will have interfaces that permit
+direct retrieval.  Examples of these interfaces might be an HTTP
+{{RFC7231}},{{RFC9110}}, or COAP {{RFC7252}} endpoint for retrieval.
+There may also be private interfaces as well.
 
-In the second case, when a device does not have an appropriate
+Using the second method, when a device does not have an appropriate
 retrieval interface, but one is directly available from the
 manufacturer, a URI to that information MUST be discovered.
 
-In the third case, a supplier may wish to make an SBOM or
+Using the third method, a supplier may wish to make an SBOM or
 vulnerability information available under certain circumstances, and
 may need to individually evaluate requests.  The result of that
 evaluation might be the SBOM or vulnerability itself or a restricted
@@ -187,9 +200,9 @@ URL or no access.
 
 To enable application-layer discovery, this memo defines a well-known
 URI {{!RFC8615}}.  Management or orchestration tools can query this
-well-known URI to retrieve a system's SBOM or vulnerability
-information.  Further queries may be necessary based on the content
-and structure of the response.
+well-known URI to retrieve a system's SBOM information.  Further
+queries may be necessary based on the content and structure of the
+response.
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL
 NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED",
@@ -201,14 +214,14 @@ How This Information Is Retrieved
 ---------------------------------
 
 For devices that can emit a URL or can establish a well-known URI, the
-mechanism may be highly automated.  For devices that have a URL in
-either their documentation or within a QR code on a box, the mechanism
-is semi-automated (someone has to scan the QR code or enter the URL).
+mechanism may be highly automated.  For devices that have a URL either
+in their documentation or within a QR code on a box, the mechanism is
+semi-automated (someone has to scan the QR code or enter the URL).
 
-Note that vulnerability and SBOM information is likely to  change at
-different rates.  The MUD semantics provide a way for manufacturers
-to control how often tooling should check for those changes through
-the cache-validity node.
+Note that vulnerability and SBOM information is likely to change at
+different rates.  MUD's cache-validity node provides a way for
+manufacturers to control how often tooling should check for those
+changes through the cache-validity node.
 
 Formats
 ------------
@@ -232,7 +245,7 @@ retrieved rather than retrieving it twice.
 The well-known transparency endpoint set
 =================================
 
-Two well known endpoint is defined:
+A well-known endpoint is defined:
 
  - "/.well-known/sbom" retrieves an SBOM.
  
@@ -262,7 +275,7 @@ The mud-sbom augmentation to the MUD YANG model
 ============================
 
 ~~~~~
-<CODE BEGINS>file "ietf-mud-transparency@2022-09-02.yang"
+<CODE BEGINS>file "ietf-mud-transparency@2023-01-12.yang"
 {::include ietf-mud-transparency.yang}
 <CODE ENDS>
 ~~~~~~
@@ -332,28 +345,23 @@ vulnerability information, and apply ACLs, as appropriate.
 
 Security Considerations
 =======================
+This document describes a schema for discovering the location of
+information relating to software transparency, and does not specify
+the access model for the information itself.  In particular, the YANG
+module specified in this document is not necessarly intended to be
+accessed via regular network management protocols, such as the NETCONF
+[RFC6241] or RESTCONF [RFC8040], and hence the regular security
+considerations for such usage are not considered here.
+ 
 
-The YANG module specified in this document defines a schema for data
-that is designed to be accessed via network management protocols such
-as NETCONF {{RFC6241}} or RESTCONF {{RFC8040}}. The lowest NETCONF layer
-is the secure transport layer, and the mandatory-to-implement secure
-transport is Secure Shell (SSH) {{RFC6242}}. The lowest RESTCONF layer
-is HTTPS, and the mandatory-to-implement secure transport is TLS
-{{RFC8446}}.
+We describe below protections relating to both discovery and some
+advice on protecting the underlying SBOM/vulnerability information.
 
-N.B., for MUD, the mandatory method of retrieval is TLS.
-
-The Network Configuration Access Control Model (NACM) {{RFC8341}}
-provides the means to restrict access for particular NETCONF or
-RESTCONF users to a preconfigured subset of all available NETCONF or
-RESTCONF protocol operations and content.
-
-There are a number of data nodes defined in this YANG module that are
-writable/creatable/deletable (i.e., config true, which is the
-default).  Write operations (e.g., edit-config) to these data nodes
-without proper protection can have a negative effect on network
-operations. These are the subtrees and data nodes and their
-sensitivity/vulnerability:
+The model specifies both encrypted and unencrypted means to retrieve
+information.  This is a matter of pragmatism.  Unencrypted
+communications allow for manipulation of information being retrieved.
+Therefore, it is RECOMMENDED that implementations offer a means to
+configure endpoints so that they may make use of TLS or DTLS.
 
 The ietf-mud-transparency module has no operational impact on the
 element itself, and is used to discover state information that may be
@@ -374,24 +382,20 @@ To address either risk, any change in a URL, and in particular to the
 authority section, should be treated with some suspicion.  One mitigation
 would be to test any cloud-based URL against a reputation service.
 
-Some of the readable data nodes in this YANG module may be considered
-sensitive or vulnerable in some network environments. It is thus
-important to control read access (e.g., via get, get-config, or
-notification) to these data nodes.  
-
 SBOMs provide an inventory of software.  If software is available to
 an attacker, the attacker may well already be able to derive this very
 same software inventory.  When this information resides on the
 endpoint itself, the endpoint SHOULD NOT provide unrestricted access
 by default.  Other servers that offer the data MAY restrict access to
 SBOM information using appropriate authorization semantics within
-HTTP.  In particular, if a system attempts to retrieve an SBOM via
+HTTP.  One way to do this would be to issue a certificate to the client for
+this purpose after a registration process has taken place.  Another
+approach would involve the use of OAUTH in combination.
+In particular, if a system attempts to retrieve an SBOM via
 HTTP and the client is not authorized, the server MUST produce an
 appropriate error, with instructions on how to register a particular
-client.  One example may be to issue a certificate to the client for
-this purpose after a registration process has taken place.  Another
-example would involve the use of OAUTH in combination with a
-federations of SBOM servers.
+client.
+
 
 Another risk is a skew in the SBOM listing and the actual software
 inventory of a device/container. For example, a manufacturer may

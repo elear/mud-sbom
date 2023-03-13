@@ -2,15 +2,8 @@
   "ietf-mud:mud": {
     "mud-version": 1,
     "extensions": [
-      "ol",
       "transparency"
     ],
-    "ol": {
-      "owners": [
-        "Copyright (c) Example, Inc. 2022. All Rights Reserved"
-      ],
-      "spdx-tag": "0BSD"
-    },
     "mudtx:transparency": {
       "sbom-local-well-known": "https"
     },
