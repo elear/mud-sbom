@@ -1,7 +1,7 @@
 ---
 title: Discovering and Retrieving Software Transparency and Vulnerability Information
 abbrev: Discovering SBOMs and Vuln. Info
-docname: draft-ietf-opsawg-sbom-access-16
+docname: draft-ietf-opsawg-sbom-access-15
 submissionType: IETF
 category: std
 ipr: trust200902
@@ -234,6 +234,12 @@ capabilities, use of a specific Accept: header in HTTP or the Accept
 Option in CoAP is NOT RECOMMENDED.  Instead, backend tooling is
 encouraged to support all known formats, and SHOULD silently discard
 SBOM information sent with a media type that is not understood.
+
+If multiple SBOMs are intended to be supported in the same file, the
+media type should properly reflect that.  For example, one might make
+use of application/\{someformat\}+json-seq.  It is left to those
+supporting those formats to make the appropriate registrations in this
+case.
 
 Some formats may support both vulnerability and software inventory
 information.  When both vulnerability and software inventory
