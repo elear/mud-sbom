@@ -1,7 +1,7 @@
 ---
 title: Discovering and Retrieving Software Transparency and Vulnerability Information
 abbrev: Discovering SBOMs and Vuln. Info
-docname: draft-ietf-opsawg-sbom-access-15
+docname: draft-ietf-opsawg-sbom-access-16
 submissionType: IETF
 category: std
 ipr: trust200902
@@ -35,17 +35,13 @@ author:
 normative:
    RFC2119:
    RFC6241:
-   RFC6242:
    RFC6991:
-   RFC7231:
    RFC7252:
    RFC8040:
-   RFC8341:
-   RFC8446:
    RFC8174:
+   RFC9110:
    
 informative:
-   RFC9110:
    EO2021:
      title: Executive Order 14028, Improving the Nations Cybersecurity
      author:
@@ -93,14 +89,21 @@ informative:
         org: OASIS
      target: https://docs.oasis-open.org/csaf/csaf-cvrf/v1.2/csaf-cvrf-v1.2.pdf
      date: September, 2017
-     
+   NISTNVD:
+     title: National Vulnerability Database
+     author:
+        org: NIST
+     target: https://nvd.nist.gov
+
+
 --- abstract
 
 To improve cybersecurity posture, automation is necessary to locate
-what software is running on a device, whether that software has known
+the software a device is using, and whether that software has known
 vulnerabilities, and what, if any recommendations suppliers may have.
-This memo extends the MUD YANG model to provide the locations of software
-bills of materials (SBOMS) and to vulnerability information.
+This memo extends the MUD YANG schema to provide the locations of software
+bills of materials (SBOMS) and to vulnerability information by introducing
+a transparency schema.
 
 
 --- middle
@@ -110,9 +113,11 @@ Introduction
 
 A number of activities have been working to improve visibility to what
 software is running on a system, and what vulnerabilities that
-software may have{{EO2021}}.
+software may have {{EO2021}}.
 
-Put simply, we seek to answer two classes of questions **at scale**:
+Put simply, this memo seeks to answer two classes of questions to the
+scale of tens of thousands of devices and a large variety of types of
+devices.  Those questions are as the following:
 
  - Is this system vulnerable to a particular vulnerability?
  - Which devices in a particular environment contain vulnerabilities
@@ -120,7 +125,7 @@ Put simply, we seek to answer two classes of questions **at scale**:
 
 This memo doesn't specify the format of this information, but rather
 only how to locate and retrieve these objects.  That is, the model is
-a discovery mechanism, and on its own provides no access to the
+intended to facilitate discovery, and on its own provides no access to the
 underlying data.
 
 Software bills of materials (SBOMs) are descriptions of what software,
@@ -132,14 +137,17 @@ System vulnerabilities may similarly be described using several data
 formats, including the aforementioned CycloneDX, Common Vulnerability
 Reporting Framework {{CVRF}}, the Common Security Advisory Format
 {{CSAF}}.  This information is typically used to report to
-administrators the state of a system.
+administrators the state of any known vulnerabilities on a system.
 
-These two classes of information can be used in concert.  For
-instance, a network management tool may discover that a system makes
-use of a particular software component that has a known vulnerability,
-and a vulnerability report may be used to indicate what if any
-versions of software correct that vulnerability, or whether the system
-exercises the vulnerable code at all.
+SBOM and vulnerability information can be used in concert with other
+sources of vulnerability information.  For a network management tool
+could discover that a system makes use of a particular set of software
+components, searches a national vulnerability database to determine
+known vulnerabilities, and then applies information provided the
+manufacturer through this mechanism to produce a vulnerability report.
+That report may be used to indicate what if any versions of software
+correct that vulnerability, or whether the system exercises the
+vulnerable code at all.
 
 Both classes of information elements are optional under the model
 specified in this memo.  One can provide only an SBOM, only
@@ -180,17 +188,19 @@ To satisfy these two key use cases, objects may be found in one of
 three methods:
 
 * on devices themselves
-* on a web site (e.g., via URI)
+* on a website (e.g., via URI)
 * through some form of out-of-band contact with the supplier.
 
 Using the first method, devices will have interfaces that permit
 direct retrieval.  Examples of these interfaces might be an HTTP
-{{RFC7231}},{{RFC9110}}, or COAP {{RFC7252}} endpoint for retrieval.
+{{RFC9110}}, or COAP {{RFC7252}} endpoint for retrieval.
 There may also be private interfaces as well.
 
 Using the second method, when a device does not have an appropriate
 retrieval interface, but one is directly available from the
-manufacturer, a URI to that information MUST be discovered.
+manufacturer, a URI to that information is discovered through
+interfaces such as MUD via DHCP or bootstrapping and ownership
+transfer mechanisms.
 
 Using the third method, a supplier may wish to make an SBOM or
 vulnerability information available under certain circumstances, and
@@ -213,12 +223,14 @@ appear in all capitals, as shown here.
 How This Information Is Retrieved
 ---------------------------------
 
-For devices that can emit a URL or can establish a well-known URI, the
-mechanism may be highly automated.  For devices that have a URL either
-in their documentation or within a QR code on a box, the mechanism is
-semi-automated (someone has to scan the QR code or enter the URL).
+Section 4 describes a data model to extend the MUD file format to carry SBOM
+and vulnerability information.  Section 1.5 of RFC8520 describes mechanisms by
+which devices can emit a URL to point to this file.  Additionally, devices can
+share this URL either through documentation or within a QR code on a box. 
+Section 2 describes a well-known URL from which an SBOM could be served from
+the local device.
 
-Note that vulnerability and SBOM information is likely to change at
+Note that vulnerability and SBOM information are likely to change at
 different rates.  MUD's cache-validity node provides a way for
 manufacturers to control how often tooling should check for those
 changes through the cache-validity node.
@@ -226,9 +238,9 @@ changes through the cache-validity node.
 Formats
 ------------
 There are multiple ways to express both SBOMs and vulnerability
-information.  When these are retrieved either directly from the device
-or directly from a web server, tools will need to observe the
-content-type header to determine precisely which format is being
+information.  When these are retrieved either from the device
+or from a remote web server, tools will need to observe the
+Content-Type header to determine precisely which format is being
 transmitted.  Because IoT devices in particular have limited
 capabilities, use of a specific Accept: header in HTTP or the Accept
 Option in CoAP is NOT RECOMMENDED.  Instead, backend tooling is
@@ -243,10 +255,10 @@ case.
 
 Some formats may support both vulnerability and software inventory
 information.  When both vulnerability and software inventory
-information is available from the same location, both sbom and vuln
-nodes MUST indicate that.  Network management systems retrieving
-this information MUST take note that the identical resource is being
-retrieved rather than retrieving it twice.
+information is available from the same URL, both sbom-url and
+vuln-url nodes MUST indicate that.  Network management systems
+retrieving this information MUST take note that the identical resource
+is being retrieved rather than retrieving it twice.
 
 The well-known transparency endpoint set
 =================================
@@ -354,7 +366,7 @@ Security Considerations
 This document describes a schema for discovering the location of
 information relating to software transparency, and does not specify
 the access model for the information itself.  In particular, the YANG
-module specified in this document is not necessarly intended to be
+module specified in this document is not necessarily intended to be
 accessed via regular network management protocols, such as the NETCONF
 [RFC6241] or RESTCONF [RFC8040], and hence the regular security
 considerations for such usage are not considered here.
@@ -385,20 +397,28 @@ in turn leads to two specific sets of risks:
  - the URLs themselves point to malware.
 
 To address either risk, any change in a URL, and in particular to the
-authority section, should be treated with some suspicion.  One mitigation
-would be to test any cloud-based URL against a reputation service.
+authority section, two approaches may be used:
 
-SBOMs provide an inventory of software.  If software is available to
-an attacker, the attacker may well already be able to derive this very
-same software inventory.  When this information resides on the
-endpoint itself, the endpoint SHOULD NOT provide unrestricted access
-by default.  Other servers that offer the data MAY restrict access to
-SBOM information using appropriate authorization semantics within
-HTTP.  One way to do this would be to issue a certificate to the client for
+* test any cloud-based URL against a reputation service.
+* provide the administrator an opportunity to approve further procesisng
+  when the authority changes to one not known to be reputable.
+
+SBOMs provide an inventory of software.  Knowledge of which specific
+software is loaded on a system can aid an attacker in identifying an
+appropriate exploit for a known vulnerability or guide the development
+of novel exploit against this system.  However, if software is
+available to an attacker, the attacker may well already be able to
+derive this very same software inventory.  When this information
+resides on the endpoint itself, the endpoint SHOULD NOT provide
+unrestricted access to the well-known URL by default.
+
+Other servers that offer the data MAY restrict access to SBOM
+information using appropriate authorization semantics within HTTP.
+One way to do this would be to issue a certificate to the client for
 this purpose after a registration process has taken place.  Another
-approach would involve the use of OAUTH in combination.
-In particular, if a system attempts to retrieve an SBOM via
-HTTP and the client is not authorized, the server MUST produce an
+approach would involve the use of OAUTH in combination.  In
+particular, if a system attempts to retrieve an SBOM via HTTP or COAP
+and the client is not authorized, the server MUST produce an
 appropriate error, with instructions on how to register a particular
 client.
 
@@ -411,14 +431,14 @@ a device. A unique mapping of a device's software version and its SBOM
 can minimize this risk.
 
 To further mitigate attacks against a device, manufacturers SHOULD
-recommend access controls.
+recommend network access controls.
 
-Vulnerability information is generally made available to such databases
-as NIST's National Vulnerability Database.  It is possible that vendor
-may wish to release information early to some customers.  We do not
-discuss here whether that is a good idea, but if it is employed, then
-appropriate access controls and authorization SHOULD be applied to the
-vulnerability resource.
+Vulnerability information is generally made available to such
+databases as NIST's National Vulnerability Database {{NISTNVD}}.  It
+is possible that vendors may wish to release information early to some
+customers.  We do not discuss here whether that is a good idea, but if
+it is employed, then appropriate access controls and authorization
+SHOULD be applied to that information.
 
 IANA Considerations
 ===================

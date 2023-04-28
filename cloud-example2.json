@@ -12,7 +12,7 @@
     "last-update": "2022-01-05T13:29:47+00:00",
     "cache-validity": 48,
     "is-supported": true,
-    "systeminfo": "retrieving vuln and SBOM info via a cloud service",
+    "systeminfo": "retrieving SBOM info via a cloud service",
     "mfg-name": "Example, Inc.",
     "documentation": "https://iot.example.com/doc/modelX",
     "model-name": "modelX"

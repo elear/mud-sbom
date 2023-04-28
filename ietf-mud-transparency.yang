@@ -146,7 +146,7 @@ module ietf-mud-transparency {
         description
           "This URI returns a JSON list of URLs that consist of
            SBOMs that were previously published for this
-           device.  Publication dates can found inside 
+           device.  Publication dates can be found inside 
            the SBOMs.";
       }
       choice vuln-retrieval-method {
